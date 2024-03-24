@@ -12,7 +12,7 @@ marked.setOptions({
   });
   
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
+    const targetInput = document.getElementById('targetInput');
     const searchResults = document.getElementById('searchResults');
     const apiKeyInput = document.getElementById('apiKey');
     const saveApiKeyButton = document.getElementById('saveApiKey');
@@ -72,8 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const predefinedPrompt = document.getElementById('predefinedPrompts').value;
         const prompt = customPrompt || predefinedPrompt;
     
-        const treatment = document.querySelector('input[name="pageTreatment"]:checked').value;
-        summarizeSelectedPages(prompt, treatment);
+        summarizeSelectedPages(prompt);
     });
     
 
@@ -89,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         searchResults.appendChild(resultElement);
     }
-    async function summarizeSelectedPages(prompt, treatment) {
+    async function summarizeSelectedPages(prompt) {
         // const selectedURLs = Array.from(searchResults.querySelectorAll('input[type="checkbox"]:checked'))
         //                          .map(checkbox => checkbox.value);
     
@@ -97,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
         //     alert('Please select at least one page to process.');
         //     return;
         // }
-    
+        let summarizedContent = '';
         const summariesContainer = document.getElementById('summaries');
         summariesContainer.innerHTML = 'Processing...';
     
@@ -110,7 +109,9 @@ document.addEventListener('DOMContentLoaded', function() {
             //  and than the prefix should be the text extracted from the json file
             const summary = await getSummaryFromGeminiPro(content, apiKey, prompt); // First-level summary
 
-            summarizedContent += `Results: ${summary}\n\n`;
+            summarizedContent += ` ${summary}\n\n`;
+            displaySummary('Results: \n', summarizedContent, summariesContainer);
+
         } catch (error) {
             console.error('Error summarizing content:', error);
             summariesContainer.innerHTML += `<div>Error occurred while processing.</div>`;
@@ -180,4 +181,4 @@ document.addEventListener('DOMContentLoaded', function() {
     
 
 
-    });
+});
