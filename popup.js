@@ -33,38 +33,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout); // Clear existing timeout to debounce the search
-        const query = searchInput.value.trim();
+    // searchInput.addEventListener('input', function() {
+    //     clearTimeout(searchTimeout); // Clear existing timeout to debounce the search
+    //     const query = searchInput.value.trim();
 
-        if (query.length > 2) { // Simple threshold to avoid too many searches
-            // Debounce search to reduce the number of searches while typing
-            searchTimeout = setTimeout(() => performSearch(query), 300);
-        } else {
-            searchResults.innerHTML = '';
-        }
-    });
-    function performSearch(query) {
-        searchResults.innerHTML = ''; // Clear previous results
-        searchResults.textContent = 'Searching...'; // Provide immediate feedback
+    //     if (query.length > 2) { // Simple threshold to avoid too many searches
+    //         // Debounce search to reduce the number of searches while typing
+    //         searchTimeout = setTimeout(() => performSearch(query), 300);
+    //     } else {
+    //         searchResults.innerHTML = '';
+    //     }
+    // });
+    // function performSearch(query) {
+    //     searchResults.innerHTML = ''; // Clear previous results
+    //     searchResults.textContent = 'Searching...'; // Provide immediate feedback
 
-        // Retrieve stored HTML content and search
-        chrome.storage.local.get(null, function(items) {
-            searchResults.innerHTML = ''; // Clear the 'Searching...' text
-            let found = false;
+    //     // Retrieve stored HTML content and search
+    //     chrome.storage.local.get(null, function(items) {
+    //         searchResults.innerHTML = ''; // Clear the 'Searching...' text
+    //         let found = false;
 
-            Object.keys(items).forEach(url => {
-                if (items[url].toLowerCase().includes(query.toLowerCase())) {
-                    appendResult(url);
-                    found = true;
-                }
-            });
+    //         Object.keys(items).forEach(url => {
+    //             if (items[url].toLowerCase().includes(query.toLowerCase())) {
+    //                 appendResult(url);
+    //                 found = true;
+    //             }
+    //         });
 
-            if (!found) {
-                searchResults.textContent = 'No matches found.';
-            }
-        });
-    }
+    //         if (!found) {
+    //             searchResults.textContent = 'No matches found.';
+    //         }
+    //     });
+    // }
 
 
     summarizeButton.addEventListener('click', function() {
@@ -90,56 +90,30 @@ document.addEventListener('DOMContentLoaded', function() {
         searchResults.appendChild(resultElement);
     }
     async function summarizeSelectedPages(prompt, treatment) {
-        const selectedURLs = Array.from(searchResults.querySelectorAll('input[type="checkbox"]:checked'))
-                                 .map(checkbox => checkbox.value);
+        // const selectedURLs = Array.from(searchResults.querySelectorAll('input[type="checkbox"]:checked'))
+        //                          .map(checkbox => checkbox.value);
     
-        if (selectedURLs.length === 0) {
-            alert('Please select at least one page to process.');
-            return;
-        }
+        // if (selectedURLs.length === 0) {
+        //     alert('Please select at least one page to process.');
+        //     return;
+        // }
     
         const summariesContainer = document.getElementById('summaries');
         summariesContainer.innerHTML = 'Processing...';
     
         let apiKey = await getApiKey();
     
-        let summarizedContent = treatment === 'combine' ? '' : [];
-    
-        for (const url of selectedURLs) {
-            try {
-                const content = await getContentFromStorage(url);
-                const bodyText = await getMainContent(content);
-                const summary = await getSummaryFromGeminiPro(bodyText, apiKey, "summarize this: "); // First-level summary
-    
-                if (treatment === 'combine') {
-                    summarizedContent += `Article from ${url}: ${summary}\n\n`;
-                } else {
-                    summarizedContent.push({ url, summary });
-                }
-            } catch (error) {
-                console.error('Error summarizing content:', error);
-                summariesContainer.innerHTML += `<div>Error occurred while processing ${url}.</div>`;
-            }
-        }
-    
-        if (treatment === 'combine') {
-            try {
-                const finalSummary = await getSummaryFromGeminiPro(summarizedContent, apiKey, prompt); // Second-level summary
-                displaySummary('Combined Content', finalSummary, summariesContainer);
-            } catch (error) {
-                console.error('Error in final processing:', error);
-                summariesContainer.innerHTML += `<div>Error occurred while processing combined content.</div>`;
-            }
-        } else {
-            for (const { url, summary } of summarizedContent) {
-                try {
-                    const finalSummary = await getSummaryFromGeminiPro(summary, apiKey, prompt); // Second-level summary for each article
-                    displaySummary(url, finalSummary, summariesContainer);
-                } catch (error) {
-                    console.error('Error in final processing for url:', url, error);
-                    summariesContainer.innerHTML += `<div>Error occurred while processing summary for ${url}.</div>`;
-                }
-            }
+        try {
+            // get the content from the content field aka old search bar
+            const content = document.getElementById('targetInput').value
+            // bodyText should contain the target email insereted by the user, 
+            //  and than the prefix should be the text extracted from the json file
+            const summary = await getSummaryFromGeminiPro(content, apiKey, prompt); // First-level summary
+
+            summarizedContent += `Results: ${summary}\n\n`;
+        } catch (error) {
+            console.error('Error summarizing content:', error);
+            summariesContainer.innerHTML += `<div>Error occurred while processing.</div>`;
         }
     }
     
