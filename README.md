@@ -33,6 +33,8 @@
 - [Acknowledgments](#acknowledgments)
 
 ## 🧐 Problem Statement <a name = "problem_statement"></a>
+ <img src="https://i.imgur.com/x7MQaz0.png" alt="Project logo">
+
 It is useful to design and follow a specific format when writing a problem statement. While there are several options
 for doing this, the following is a simple and straightforward template often used in Business Analysis to maintain
 focus on defining the problem.
