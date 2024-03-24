@@ -55,3 +55,4 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         sendResponse({ status: "HTML stored successfully" });
     }
 });
+

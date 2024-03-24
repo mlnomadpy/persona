@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveApiKeyButton = document.getElementById('saveApiKey');
     const savePersonaKeyButton = document.getElementById('savePersona');
     const summarizeButton = document.getElementById('summarizeButton');
+    const loadPersonasButton = document.getElementById('loadPersonasButton');
     let searchTimeout;
 
     // Load saved API key
@@ -27,11 +28,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+
+
+
+
+    
     // Save the API key
     saveApiKeyButton.addEventListener('click', function() {
         chrome.storage.sync.set({'apiKey': apiKeyInput.value}, function() {
             alert('API Key saved');
         });
+    });
+    loadPersonasButton.addEventListener('click', function(){
+        loadAndProcessPersonas(createOption);
     });
     savePersonaKeyButton.addEventListener('click', function() {
 
@@ -42,39 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const personaDescription = document.getElementById('customPrompt').value        
         storePersona(personaName, personaDescription);
         createOption(personaName, personaDescription);
+
     });
-    // searchInput.addEventListener('input', function() {
-    //     clearTimeout(searchTimeout); // Clear existing timeout to debounce the search
-    //     const query = searchInput.value.trim();
 
-    //     if (query.length > 2) { // Simple threshold to avoid too many searches
-    //         // Debounce search to reduce the number of searches while typing
-    //         searchTimeout = setTimeout(() => performSearch(query), 300);
-    //     } else {
-    //         searchResults.innerHTML = '';
-    //     }
-    // });
-    // function performSearch(query) {
-    //     searchResults.innerHTML = ''; // Clear previous results
-    //     searchResults.textContent = 'Searching...'; // Provide immediate feedback
-
-    //     // Retrieve stored HTML content and search
-    //     chrome.storage.local.get(null, function(items) {
-    //         searchResults.innerHTML = ''; // Clear the 'Searching...' text
-    //         let found = false;
-
-    //         Object.keys(items).forEach(url => {
-    //             if (items[url].toLowerCase().includes(query.toLowerCase())) {
-    //                 appendResult(url);
-    //                 found = true;
-    //             }
-    //         });
-
-    //         if (!found) {
-    //             searchResults.textContent = 'No matches found.';
-    //         }
-    //     });
-    // }
 // TODO: add load all personas
 
     summarizeButton.addEventListener('click', function() {
@@ -198,14 +177,49 @@ document.addEventListener('DOMContentLoaded', function() {
     
     
 
-    
+    // 
     function storePersona(persona, personaContent) {
-        chrome.storage.local.set({ [persona]: personaContent }, function() {
+        // Load existing personas
+        chrome.storage.local.get("personas", function(result) {
             if (chrome.runtime.lastError) {
-                console.error("Error storing HTML content for", url, ":", chrome.runtime.lastError.message);
-            } else {
-                console.log("HTML content stored successfully for", url);
+                console.error("Error loading personas:", chrome.runtime.lastError.message);
+                return;
             }
+            
+            // Extract existing personas or initialize an empty object
+            const existingPersonas = result.personas || {};
+            
+            // Append the new persona
+            existingPersonas[persona] = personaContent;
+            
+            // Store combined personas
+            chrome.storage.local.set({ "personas": existingPersonas }, function() {
+                if (chrome.runtime.lastError) {
+                    console.error("Error storing personas:", chrome.runtime.lastError.message);
+                } else {
+                    console.log("Persona stored successfully:", persona);
+                }
+            });
+        });
+    }
+    
+    
+// 
+    // Loading all the saved personas
+    function loadAndProcessPersonas(processPersonaFunction) {
+        chrome.storage.local.get("personas", function(result) {
+            if (chrome.runtime.lastError) {
+                console.error("Error loading personas:", chrome.runtime.lastError.message);
+                return;
+            }
+            
+            const personas = result.personas || {};
+            
+            // Iterate through each persona and call the processPersonaFunction for each
+            Object.keys(personas).forEach(personaName => {
+                const personaDescription = personas[personaName];
+                processPersonaFunction(personaName, personaDescription);
+            });
         });
     }
     function createOption(personaName, personaContent){
@@ -216,5 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
         select.appendChild(opt);
 
     }
+
 });
 
