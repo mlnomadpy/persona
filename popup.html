@@ -72,12 +72,13 @@ button:hover {
 <!-- Custom Prompt Input and Predefined Prompts Dropdown -->
 <div class="prompt-section">
     <label for="customPrompt">Your Own Persona:</label>
+    <input type="text" id="personaName" placeholder="Name your Persona">
     <input type="text" id="customPrompt" placeholder="Describe the Persona and what you want to do?">
+    <button id="savePersona">Save Persona</button>
+    
     <select id="predefinedPrompts">
         <option value="">Select your Persona</option>
         <option value="eminem">Eminem</option>
-        <option value="polikar">Dr. Polikar</option>
-        <option value="trafford">Professor Trafford</option>
         <!-- Add more predefined prompts as needed -->
     </select>
 </div>

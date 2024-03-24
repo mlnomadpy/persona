@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchResults = document.getElementById('searchResults');
     const apiKeyInput = document.getElementById('apiKey');
     const saveApiKeyButton = document.getElementById('saveApiKey');
+    const savePersonaKeyButton = document.getElementById('savePersona');
     const summarizeButton = document.getElementById('summarizeButton');
     let searchTimeout;
 
@@ -32,7 +33,16 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('API Key saved');
         });
     });
+    savePersonaKeyButton.addEventListener('click', function() {
 
+        chrome.storage.sync.set({'apiKey': apiKeyInput.value}, function() {
+            alert('API Key saved');
+        });
+        const personaName = document.getElementById('personaName').value        
+        const personaDescription = document.getElementById('customPrompt').value        
+        storePersona(personaName, personaDescription);
+        createOption(personaName, personaDescription);
+    });
     // searchInput.addEventListener('input', function() {
     //     clearTimeout(searchTimeout); // Clear existing timeout to debounce the search
     //     const query = searchInput.value.trim();
@@ -65,8 +75,16 @@ document.addEventListener('DOMContentLoaded', function() {
     //         }
     //     });
     // }
+// TODO: add load all personas
 
-
+    summarizeButton.addEventListener('click', function() {
+        const customPrompt = document.getElementById('customPrompt').value;
+        const predefinedPrompt = document.getElementById('predefinedPrompts').value;
+        const prompt = customPrompt || predefinedPrompt;
+    
+        summarizeSelectedPages(prompt);
+    });
+    
     summarizeButton.addEventListener('click', function() {
         const customPrompt = document.getElementById('customPrompt').value;
         const predefinedPrompt = document.getElementById('predefinedPrompts').value;
@@ -180,5 +198,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     
 
+    
+    function storePersona(persona, personaContent) {
+        chrome.storage.local.set({ [persona]: personaContent }, function() {
+            if (chrome.runtime.lastError) {
+                console.error("Error storing HTML content for", url, ":", chrome.runtime.lastError.message);
+            } else {
+                console.log("HTML content stored successfully for", url);
+            }
+        });
+    }
+    function createOption(personaName, personaContent){
+        let select = document.getElementById('predefinedPrompts');
+        let opt = document.createElement('option');
+        opt.value = personaContent;
+        opt.innerHTML = personaName;
+        select.appendChild(opt);
 
+    }
 });
+
