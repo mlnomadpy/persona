@@ -35,10 +35,6 @@
 ## 🧐 Problem Statement <a name = "problem_statement"></a>
  <img src="https://i.imgur.com/x7MQaz0.png" alt="Project logo">
 
-It is useful to design and follow a specific format when writing a problem statement. While there are several options
-for doing this, the following is a simple and straightforward template often used in Business Analysis to maintain
-focus on defining the problem.
-
 - IDEAL: This extension would allow people to enter info about what kind of email they are trying to write and recieve an AI generated text that resembles an email in the style of ECE Department members.
 - REALITY: This extension allows people to enter info about what kind of email they are trying to write and recieve an AI generated text that resembles an email in the style of Nanccy (the Assistant to the ECE Department) and our team member Atika.
 - CONSEQUENCES: The overall function of the extension is still able to write emails based on our prompts, however the range of styles are more limited, which could affect how many people find this useful.
